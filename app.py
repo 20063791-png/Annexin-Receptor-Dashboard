@@ -359,7 +359,21 @@ This threshold is calculated across all cells in the dataset.
                 show=False,
                 ax=ax3
             )
+    colA, colB = st.columns(2)
 
+    colA.metric(
+        "Cells Displayed",
+         f"{temp.n_obs:,}"
+        if umap_mode != "Annotated Cell Types"
+        else f"{adata.n_obs:,}"
+    )
+
+    colB.metric(
+        "% Dataset Displayed",
+        f"{100*temp.n_obs/adata.n_obs:.1f}%"
+        if umap_mode != "Annotated Cell Types"
+        else "100%"
+    )
         st.pyplot(fig3)
 
         fig3.savefig(
