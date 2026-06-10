@@ -204,7 +204,40 @@ Cell types are ranked by mean expression.
         plt.tight_layout()
 
         st.pyplot(fig)
+    st.subheader(
+        "Expression Heatmap"
+    )
 
+    fig_heat, ax_heat = plt.subplots(
+        figsize=(4,8)
+    )
+
+    heat_data = summary[
+        ["Mean_Expression"]
+    ]
+
+    ax_heat.imshow(
+        heat_data,
+        aspect="auto"
+    )
+
+    ax_heat.set_yticks(
+        range(len(heat_data.index))
+    )
+
+    ax_heat.set_yticklabels(
+        heat_data.index
+    )
+
+    ax_heat.set_xticks([0])
+
+    ax_heat.set_xticklabels(
+        ["Mean Expression"]
+    )
+
+    plt.tight_layout()
+
+    st.pyplot(fig_heat)
         # ------------------------------------------
         # CONDITION COMPARISON
         # ------------------------------------------
