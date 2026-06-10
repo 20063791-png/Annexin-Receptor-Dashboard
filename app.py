@@ -27,6 +27,10 @@ def load_data():
 
 adata = load_data()
 
+# --------------------------------------------------
+# SIDEBAR
+# --------------------------------------------------
+
 st.title("Annexin Receptor Dashboard")
 
 st.sidebar.header("Gene Search")
@@ -35,11 +39,12 @@ gene = st.sidebar.text_input(
     "Enter Gene Symbol",
     value="ANXA1"
 )
+
 st.sidebar.markdown("---")
 
 umap_mode = st.sidebar.radio(
     "UMAP Display Mode",
-   [
+    [
         "Annotated Cell Types",
         "All Cells",
         "Positive Cells Only",
@@ -50,13 +55,12 @@ umap_mode = st.sidebar.radio(
 
 st.sidebar.markdown("---")
 
-st.sidebar.write(
-    f"Cells: {adata.n_obs:,}"
-)
+st.sidebar.write(f"Cells: {adata.n_obs:,}")
+st.sidebar.write(f"Genes: {adata.n_vars:,}")
 
-st.sidebar.write(
-    f"Genes: {adata.n_vars:,}"
-)
+# --------------------------------------------------
+# GENE ANALYSIS
+# --------------------------------------------------
 
 if gene:
 
@@ -83,9 +87,11 @@ if gene:
         summary = (
             df.groupby("cell_type")
             .agg(
-                Mean_Expression=("expression","mean"),
-                Percent_Positive=("expression",
-                                  lambda x:(x>0).mean()*100)
+                Mean_Expression=("expression", "mean"),
+                Percent_Positive=(
+                    "expression",
+                    lambda x: (x > 0).mean() * 100
+                )
             )
             .sort_values(
                 "Mean_Expression",
@@ -93,21 +99,19 @@ if gene:
             )
         )
 
-        st.subheader(
-            "Top 10 Expressing Cell Types"
+        st.subheader("Top 10 Expressing Cell Types")
+
+        st.info(
+            """
+Mean Expression = average expression across all cells within a cell type.
+
+Percent Positive = percentage of cells expressing the gene (>0 expression).
+
+Cell types are ranked by mean expression.
+"""
         )
-        
-    st.info("""
-    Mean Expression = average expression across all cells in that cell type.
 
-    Percent Positive = percentage of cells expressing the gene (>0 expression).
-
-    Cell types are ranked by mean expression.
-    """)
-
-        st.dataframe(
-            summary.head(10)
-        )
+        st.dataframe(summary.head(10))
 
         csv = summary.to_csv()
 
@@ -117,25 +121,28 @@ if gene:
             file_name=f"{gene}_summary.csv"
         )
 
-        st.subheader(
-            "Expression Across Cell Types"
-        )
+        # ------------------------------------------
+        # CELL TYPE BARPLOT
+        # ------------------------------------------
 
-        fig, ax = plt.subplots(
-            figsize=(10,5)
-        )
+        st.subheader("Expression Across Cell Types")
 
-        summary["Mean_Expression"].plot.bar(
-            ax=ax
-        )
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        summary["Mean_Expression"].plot.bar(ax=ax)
+
+        ax.set_ylabel("Mean Expression")
+        ax.set_xlabel("Cell Type")
 
         plt.tight_layout()
 
         st.pyplot(fig)
 
-        st.subheader(
-            "Condition Comparison"
-        )
+        # ------------------------------------------
+        # CONDITION COMPARISON
+        # ------------------------------------------
+
+        st.subheader("Condition Comparison")
 
         cond_df = pd.DataFrame({
             "Condition": adata.obs["Condition"],
@@ -148,101 +155,123 @@ if gene:
             .mean()
         )
 
-        fig2, ax2 = plt.subplots()
+        fig2, ax2 = plt.subplots(figsize=(6, 5))
 
-        cond_summary.plot.bar(
-            ax=ax2
-        )
+        cond_summary.plot.bar(ax=ax2)
+
+        ax2.set_ylabel("Mean Expression")
+        ax2.set_xlabel("Condition")
 
         plt.tight_layout()
 
         st.pyplot(fig2)
-st.header("UMAP Visualization")
 
-if umap_mode == "Annotated Cell Types":
+        # ------------------------------------------
+        # UMAP
+        # ------------------------------------------
 
-    fig3, ax3 = plt.subplots(figsize=(10,8))
+        st.header("UMAP Visualization")
 
-    sc.pl.umap(
-        adata,
-        color="cell_type",
-        legend_loc="on data",
-        frameon=False,
-        show=False,
-        ax=ax3
-    )
+        if umap_mode == "Annotated Cell Types":
 
-    st.write("""
-    Annotated UMAP showing all cell populations.
-    Labels correspond to cell-type annotations.
-    """)
+            fig3, ax3 = plt.subplots(figsize=(10, 8))
 
-    st.pyplot(fig3)
+            sc.pl.umap(
+                adata,
+                color="cell_type",
+                legend_loc="on data",
+                frameon=False,
+                show=False,
+                ax=ax3
+            )
 
-else:
+            st.write(
+                """
+Annotated UMAP showing all cell populations.
 
-    temp = adata.copy()
+Labels correspond to cell-type annotations.
+"""
+            )
 
-    expr = temp[:, gene].X
+        else:
 
-    if not isinstance(expr, np.ndarray):
-        expr = expr.toarray()
+            temp = adata.copy()
 
-    expr = expr.flatten()
+            expr_temp = temp[:, gene].X
 
-    if umap_mode == "Positive Cells Only":
+            if not isinstance(expr_temp, np.ndarray):
+                expr_temp = expr_temp.toarray()
 
-        temp = temp[expr > 0]
+            expr_temp = expr_temp.flatten()
 
-        st.write("""
-        Showing only cells with detectable expression (>0).
-        """)
-    elif umap_mode == "All Cells":
+            if umap_mode == "All Cells":
 
-        st.write("""
-        Showing all cells coloured by expression intensity.
-        """)
-    elif umap_mode == "Top 10% Expressing Cells":
+                st.write(
+                    """
+Showing all cells coloured according to gene expression intensity.
+"""
+                )
 
-        cutoff = np.percentile(expr, 90)
+            elif umap_mode == "Positive Cells Only":
 
-        temp = temp[expr >= cutoff]
+                temp = temp[expr_temp > 0]
 
-        st.write("""
-        Showing only the top 10% highest expressing cells.
-        """)
+                st.write(
+                    """
+Showing only cells with detectable expression (>0).
+"""
+                )
 
-    elif umap_mode == "Top 50% Expressing Cells":
+            elif umap_mode == "Top 10% Expressing Cells":
 
-        cutoff = np.percentile(expr, 50)
+                cutoff = np.percentile(expr_temp, 90)
 
-        temp = temp[expr >= cutoff]
+                temp = temp[expr_temp >= cutoff]
 
-        st.write("""
-        Showing only the top 50% highest expressing cells.
-        """)
+                st.write(
+                    """
+Showing only the highest 10% expressing cells.
 
-    fig3, ax3 = plt.subplots(figsize=(10,8))
+This threshold is calculated across all cells in the dataset.
+"""
+                )
 
-    sc.pl.umap(
-        temp,
-        color=gene,
-        frameon=False,
-        show=False,
-        ax=ax3
-    )
+            elif umap_mode == "Top 50% Expressing Cells":
 
-    st.pyplot(fig3)
-    fig3.savefig(
-    "UMAP.png",
-    dpi=300,
-    bbox_inches="tight"
-)
+                cutoff = np.percentile(expr_temp, 50)
 
-with open("UMAP.png","rb") as f:
+                temp = temp[expr_temp >= cutoff]
 
-    st.download_button(
-        "Download UMAP",
-        f,
-        file_name=f"{gene}_UMAP.png"
-    )
+                st.write(
+                    """
+Showing only the highest 50% expressing cells.
+
+This threshold is calculated across all cells in the dataset.
+"""
+                )
+
+            fig3, ax3 = plt.subplots(figsize=(10, 8))
+
+            sc.pl.umap(
+                temp,
+                color=gene,
+                frameon=False,
+                show=False,
+                ax=ax3
+            )
+
+        st.pyplot(fig3)
+
+        fig3.savefig(
+            "UMAP.png",
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+        with open("UMAP.png", "rb") as f:
+
+            st.download_button(
+                "Download UMAP",
+                f,
+                file_name=f"{gene}_UMAP.png"
+            )
