@@ -57,7 +57,27 @@ st.sidebar.markdown("---")
 
 st.sidebar.write(f"Cells: {adata.n_obs:,}")
 st.sidebar.write(f"Genes: {adata.n_vars:,}")
+st.sidebar.markdown("---")
 
+cell_types = sorted(
+    adata.obs["cell_type"].unique()
+)
+
+selected_cell_types = st.sidebar.multiselect(
+    "Cell Type Filter",
+    cell_types,
+    default=cell_types
+)
+
+conditions = sorted(
+    adata.obs["Condition"].unique()
+)
+
+selected_conditions = st.sidebar.multiselect(
+    "Condition Filter",
+    conditions,
+    default=conditions
+)
 # --------------------------------------------------
 # GENE ANALYSIS
 # --------------------------------------------------
