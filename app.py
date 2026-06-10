@@ -101,8 +101,17 @@ if gene:
 
         df = pd.DataFrame({
             "cell_type": adata.obs["cell_type"],
+            "Condition": adata.obs["Condition"],
             "expression": expr
         })
+
+        df = df[
+            df["cell_type"].isin(selected_cell_types)
+        ]
+
+        df = df[
+             df["Condition"].isin(selected_conditions)
+        ]
 
         summary = (
             df.groupby("cell_type")
