@@ -166,6 +166,21 @@ if gene:
             "Highest Condition",
             highest_condition
         )
+        st.success(
+    f"""
+🧠 Lab Sutti Insight
+
+{gene} shows its strongest expression in
+{highest_cell_type}.
+
+Approximately {positive_pct:.1f}% of cells
+express this gene.
+
+The strongest condition-level signal is
+observed in {highest_condition}.
+"""
+)
+        
         st.subheader("Top 10 Expressing Cell Types")
 
         st.info(
