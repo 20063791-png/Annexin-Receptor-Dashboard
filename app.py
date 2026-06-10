@@ -129,10 +129,7 @@ if gene:
 
             st.stop()
 
-        cond_df = pd.DataFrame({
-            "Condition": adata.obs["Condition"],
-            "expression": expr
-        })
+        cond_df = df.copy()
 
         summary = (
             df.groupby("cell_type")
@@ -273,50 +270,16 @@ Cell types are ranked by mean expression.
         st.pyplot(fig)
 
         # ==========================================
-        # EXPRESSION HEATMAP
+        # TOP 15 EXPRESSING CELL TYPES
         # ==========================================
 
         st.subheader(
-            "Top Expressing Cell Types"
+             "Top 15 Expressing Cell Types"
         )
 
-        fig_heat, ax_heat = plt.subplots(
-            figsize=(8, 6)
+        st.dataframe(
+        summary.head(15)
         )
-
-        top_heat = summary.head(15)
-
-        heatmap = ax_heat.imshow(
-            top_heat[["Mean_Expression"]],
-            aspect="auto"
-        )
-
-        ax_heat.set_yticks(
-            range(len(top_heat.index))
-        )
-
-        ax_heat.set_yticklabels(
-            top_heat.index
-        )
-
-        ax_heat.set_xticks([0])
-
-        ax_heat.set_xticklabels(
-            ["Mean Expression"]
-        )
-
-        cbar = plt.colorbar(
-            heatmap,
-            ax=ax_heat
-        )
-
-        cbar.set_label(
-            "Mean Expression"
-        )
-
-        plt.tight_layout()
-
-        st.pyplot(fig_heat)
        
 
         # ==========================================
