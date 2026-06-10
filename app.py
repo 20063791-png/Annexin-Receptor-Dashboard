@@ -135,9 +135,15 @@ if gene:
             df.groupby("cell_type")
              .agg(
                 Mean_Expression=("expression", "mean"),
+
                 Percent_Positive=(
                     "expression",
-                    lambda x: (x > 0).mean() * 100
+                     lambda x: (x > 0).mean() * 100
+                ),
+
+                Cell_Count=(
+                    "expression",
+                    "count"
                 )
             )
             .sort_values(
@@ -204,15 +210,18 @@ if gene:
 
         st.success(
             f"""
-🧠 Lab Sutti Insight
+        🧠 Lab Sutti Insight
 
-{gene} shows its strongest expression in {highest_cell_type}.
+        {gene} shows strongest enrichment in {highest_cell_type}.
 
-Approximately {positive_pct:.1f}% of cells express this gene.
+        Approximately {positive_pct:.1f}% of analysed cells express this gene.
 
-The strongest condition-level signal is observed in {highest_condition}.
-"""
+        The highest condition-level expression is observed in {highest_condition}.
+
+        This suggests that {highest_cell_type} may be a major contributor to the biological signal associated with {gene}.
+        """
         )
+        
         # ==========================================
         # TOP CELL TYPES TABLE
         # ==========================================
