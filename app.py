@@ -39,20 +39,15 @@ st.sidebar.markdown("---")
 
 umap_mode = st.sidebar.radio(
     "UMAP Display Mode",
-    [
+   [
         "Annotated Cell Types",
         "All Cells",
         "Positive Cells Only",
-        "Top Expressing Cells"
+        "Top 10% Expressing Cells",
+        "Top 50% Expressing Cells"
     ]
 )
 
-percentile = st.sidebar.slider(
-    "Top Expression Percentile",
-    min_value=1,
-    max_value=50,
-    value=10
-)
 st.sidebar.markdown("---")
 
 st.sidebar.write(
