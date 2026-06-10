@@ -278,19 +278,6 @@ Cell types are ranked by mean expression.
         st.pyplot(fig)
 
         # ==========================================
-        # TOP 15 EXPRESSING CELL TYPES
-        # ==========================================
-
-        st.subheader(
-             "Top 15 Expressing Cell Types"
-        )
-
-        st.dataframe(
-        summary.head(15)
-        )
-       
-
-        # ==========================================
         # CONDITION COMPARISON
         # ==========================================
 
