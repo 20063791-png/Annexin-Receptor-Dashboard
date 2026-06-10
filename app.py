@@ -269,7 +269,19 @@ Cell types are ranked by mean expression.
         # ------------------------------------------
         # UMAP
         # ------------------------------------------
+    st.subheader(
+        "Download Filtered Dataset"
+    )
 
+    filtered_csv = df.to_csv(
+        index=False
+    )
+
+    st.download_button(
+        "Download Filtered Data",
+        filtered_csv,
+        file_name=f"{gene}_filtered_data.csv"
+    )
         st.header("UMAP Visualization")
 
         if umap_mode == "Annotated Cell Types":
