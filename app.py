@@ -97,13 +97,13 @@ if gene:
             "Top 10 Expressing Cell Types"
         )
         
-st.info("""
-Mean Expression = average expression across all cells in that cell type.
+    st.info("""
+    Mean Expression = average expression across all cells in that cell type.
 
-Percent Positive = percentage of cells expressing the gene (>0 expression).
+    Percent Positive = percentage of cells expressing the gene (>0 expression).
 
-Cell types are ranked by mean expression.
-""")
+    Cell types are ranked by mean expression.
+    """)
 
         st.dataframe(
             summary.head(10)
