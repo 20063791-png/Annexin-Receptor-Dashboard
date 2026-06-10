@@ -136,11 +136,8 @@ if gene:
 
         summary = (
             df.groupby("cell_type")
-            .agg(
-                Mean_Expression=(
-                    "expression",
-                    "mean"
-                ),
+             .agg(
+                Mean_Expression=("expression", "mean"),
                 Percent_Positive=(
                     "expression",
                     lambda x: (x > 0).mean() * 100
@@ -151,13 +148,15 @@ if gene:
                 ascending=False
             )
         )
-if summary.empty:
 
-    st.warning(
-        "No cells remain after the selected filters."
-    )
+        if summary.empty:
 
-    st.stop()
+            st.warning(
+                "No cells remain after the selected filters."
+            )
+
+            st.stop()
+
         highest_cell_type = summary.index[0]
 
         highest_condition = (
