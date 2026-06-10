@@ -35,7 +35,24 @@ gene = st.sidebar.text_input(
     "Enter Gene Symbol",
     value="ANXA1"
 )
+st.sidebar.markdown("---")
 
+umap_mode = st.sidebar.radio(
+    "UMAP Display Mode",
+    [
+        "Annotated Cell Types",
+        "All Cells",
+        "Positive Cells Only",
+        "Top Expressing Cells"
+    ]
+)
+
+percentile = st.sidebar.slider(
+    "Top Expression Percentile",
+    min_value=1,
+    max_value=50,
+    value=10
+)
 st.sidebar.markdown("---")
 
 st.sidebar.write(
@@ -137,3 +154,83 @@ if gene:
         plt.tight_layout()
 
         st.pyplot(fig2)
+st.header("UMAP Visualization")
+
+if umap_mode == "Annotated Cell Types":
+
+    fig3, ax3 = plt.subplots(figsize=(10,8))
+
+    sc.pl.umap(
+        adata,
+        color="cell_type",
+        legend_loc="on data",
+        frameon=False,
+        show=False,
+        ax=ax3
+    )
+
+    st.write("""
+    Annotated UMAP showing all cell populations.
+    Labels correspond to cell-type annotations.
+    """)
+
+    st.pyplot(fig3)
+
+else:
+
+    temp = adata.copy()
+
+    expr = temp[:, gene].X
+
+    if not isinstance(expr, np.ndarray):
+        expr = expr.toarray()
+
+    expr = expr.flatten()
+
+    if umap_mode == "Positive Cells Only":
+
+        temp = temp[expr > 0]
+
+        st.write("""
+        Showing only cells with detectable expression (>0).
+        """)
+
+    elif umap_mode == "Top Expressing Cells":
+
+        cutoff = np.percentile(
+            expr,
+            100 - percentile
+        )
+
+        temp = temp[expr >= cutoff]
+
+        st.write(
+            f"""
+            Showing top {percentile}% highest expressing cells.
+            """
+        )
+
+    fig3, ax3 = plt.subplots(figsize=(10,8))
+
+    sc.pl.umap(
+        temp,
+        color=gene,
+        frameon=False,
+        show=False,
+        ax=ax3
+    )
+
+    st.pyplot(fig3)
+    fig3.savefig(
+    "UMAP.png",
+    dpi=300,
+    bbox_inches="tight"
+)
+
+with open("UMAP.png","rb") as f:
+
+    st.download_button(
+        "Download UMAP",
+        f,
+        file_name=f"{gene}_UMAP.png"
+    )
