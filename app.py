@@ -169,13 +169,12 @@ if gene:
             .idxmax()
         )
 
-        mean_expression = expr.mean()
+        mean_expression = df["expression"].mean()
 
         positive_pct = (
-            (expr > 0).mean()
+            (df["expression"] > 0).mean()
             * 100
         )
-
         # ==========================================
         # GENE SUMMARY
         # ==========================================
