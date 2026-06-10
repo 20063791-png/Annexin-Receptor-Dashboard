@@ -127,7 +127,45 @@ if gene:
                 ascending=False
             )
         )
+        highest_cell_type = summary.index[0]
 
+        highest_condition = (
+            cond_df.groupby("Condition")
+            ["expression"]
+            .mean()
+            .idxmax()
+        )
+
+        mean_expression = expr.mean()
+
+        positive_pct = (
+            (expr > 0).mean()
+            * 100
+        )
+
+        st.subheader("Gene Summary")
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric(
+            "Mean Expression",
+            f"{mean_expression:.3f}"
+        )
+
+        col2.metric(
+            "% Positive Cells",
+            f"{positive_pct:.1f}%"
+        )
+
+        col3.metric(
+            "Highest Cell Type",
+            highest_cell_type
+        )
+
+        col4.metric(
+            "Highest Condition",
+            highest_condition
+        )
         st.subheader("Top 10 Expressing Cell Types")
 
         st.info(
