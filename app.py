@@ -200,23 +200,23 @@ else:
 
     elif umap_mode == "Top 10% Expressing Cells":
 
-    cutoff = np.percentile(expr, 90)
+        cutoff = np.percentile(expr, 90)
 
-    temp = temp[expr >= cutoff]
+        temp = temp[expr >= cutoff]
 
-    st.write("""
-    Showing only the top 10% highest expressing cells.
-    """)
+        st.write("""
+        Showing only the top 10% highest expressing cells.
+        """)
 
-elif umap_mode == "Top 50% Expressing Cells":
+    elif umap_mode == "Top 50% Expressing Cells":
 
-    cutoff = np.percentile(expr, 50)
+        cutoff = np.percentile(expr, 50)
 
-    temp = temp[expr >= cutoff]
+        temp = temp[expr >= cutoff]
 
-    st.write("""
-    Showing only the top 50% highest expressing cells.
-    """)
+        st.write("""
+        Showing only the top 50% highest expressing cells.
+        """)
 
     fig3, ax3 = plt.subplots(figsize=(10,8))
 
