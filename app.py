@@ -151,7 +151,13 @@ if gene:
                 ascending=False
             )
         )
+if summary.empty:
 
+    st.warning(
+        "No cells remain after the selected filters."
+    )
+
+    st.stop()
         highest_cell_type = summary.index[0]
 
         highest_condition = (
@@ -272,28 +278,26 @@ Cell types are ranked by mean expression.
         # ==========================================
 
         st.subheader(
-            "Expression Heatmap"
+            "Top Expressing Cell Types"
         )
 
         fig_heat, ax_heat = plt.subplots(
-            figsize=(4, 8)
+            figsize=(8, 6)
         )
 
-        heat_data = summary[
-            ["Mean_Expression"]
-        ]
+        top_heat = summary.head(15)
 
-        ax_heat.imshow(
-            heat_data,
+        heatmap = ax_heat.imshow(
+            top_heat[["Mean_Expression"]],
             aspect="auto"
         )
 
         ax_heat.set_yticks(
-            range(len(heat_data.index))
+            range(len(top_heat.index))
         )
 
         ax_heat.set_yticklabels(
-            heat_data.index
+            top_heat.index
         )
 
         ax_heat.set_xticks([0])
@@ -302,9 +306,19 @@ Cell types are ranked by mean expression.
             ["Mean Expression"]
         )
 
+        cbar = plt.colorbar(
+            heatmap,
+            ax=ax_heat
+        )
+
+        cbar.set_label(
+            "Mean Expression"
+        )
+
         plt.tight_layout()
 
         st.pyplot(fig_heat)
+       
 
         # ==========================================
         # CONDITION COMPARISON
