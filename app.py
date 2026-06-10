@@ -197,7 +197,11 @@ else:
         st.write("""
         Showing only cells with detectable expression (>0).
         """)
+    elif umap_mode == "All Cells":
 
+        st.write("""
+        Showing all cells coloured by expression intensity.
+        """)
     elif umap_mode == "Top 10% Expressing Cells":
 
         cutoff = np.percentile(expr, 90)
